@@ -34,12 +34,22 @@ if (!empty($messages)) {
 <?php
 if (!empty($_COOKIE[session_name()]) && !empty($_SESSION['login'])){
     echo '
+        <div class = "login">
         <form action="" method="POST" >
             <input type="hidden" name="logout" value="true">
             <button type="submit">Выйти</button>
         </form>
+        </div>
     ';
 }
+else 
+    echo'
+    <div class = "login">
+    <form action="login.php" target="_blank">
+    <button>Войти</button>
+    </form>
+    </div>
+';
 ?>
         <form id="form1" action="" method="POST">
             <div class="form-group">
