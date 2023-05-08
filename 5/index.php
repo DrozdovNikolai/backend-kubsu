@@ -320,7 +320,8 @@ else {
 
 
  
-
+ if(count($result2)==3&&count($_POST['abilities'])!=3)
+        $flag=true;
 
           if($flag){
             $stmt = $db->prepare("DELETE FROM app_ability2 WHERE id_app=(SELECT id FROM application2 where user_id=?) ");
