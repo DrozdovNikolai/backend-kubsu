@@ -303,14 +303,21 @@ else {
           $result2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-          $c=0;
+                    $c=0;
           $flag=false;
-          foreach ($_POST['abilities'] as $ability) {
-            if ($result2[$ability]!=$ability){
-                $flag=true;
-                break;
-            }
-        }
+          foreach ( $_POST['abilities'] as $ability) {
+              if(isset($result2[$ability-1]['id_ab'])){
+                  if ($result2[$ability-1]['id_ab']!=$ability){
+                      $flag=true;
+                      break;
+                  }
+              }
+              else {
+                  $flag=true;
+                  break;
+              }
+          }
+
 
  
 
