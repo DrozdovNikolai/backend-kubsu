@@ -54,9 +54,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'gender' => $_POST['gender' . $row],
                 'limbs' => $_POST['limbs' . $row],
                 'bio' => $_POST['bio'][$row],
-                'checkbox' => $_POST['checkbox'][$row]
+                'checkbox' => $_POST['checkbox'.$row]
             ];
-            
+           // var_dump($data);
             $abilities = $_POST['abilities' . $row];
             $errors=validateFormData($data, $abilities,$row);
             
@@ -76,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'gender' => $_POST['gender' . $row],
                 'limbs' => $_POST['limbs' . $row],
                 'bio' => $_POST['bio'][$row],
-                'checkbox' => $_POST['checkbox'][$row]
+                'checkbox' => $_POST['checkbox'.$row]
             ];
             
             $abilities = $_POST['abilities' . $row];
@@ -240,7 +240,7 @@ $result2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
     (isset($result2[2]['id_ab']) && $result2[2]['id_ab'] == '3')) {print 'selected';}} ?>>левитация</option>
                 </select></td>
     <td><textarea  name="bio[]" rows="3" class="form-control <?php if ($errors['bio']) {print 'is-invalid';} ?>"><?= strip_tags($res["bio"]) ?></textarea></td>
-    <td><input name="checkbox[]" type="checkbox" class="form-check-input <?php if ($errors['checkbox']) {print 'is-invalid';} ?>" value="1" <?php if ($res["checkbox"]=="1") {print 'checked';} ?>></td>
+    <td><input name="checkbox<?= $counter ?>" type="checkbox" class="form-check-input <?php if ($errors['checkbox']) {print 'is-invalid';} ?>" value="1" <?php if ($res["checkbox"]=="1") {print 'checked';} ?>></td>
     <td><?= $res["user_id"] ?></td>
     <td><input type="checkbox" name="row[]" value="<?= $counter ?>"></td>
     <?php $counter++ ?>
