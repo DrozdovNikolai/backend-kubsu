@@ -24,12 +24,12 @@ $result = $stmt->fetch(PDO::FETCH_ASSOC);
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $messages2 = array();
-
+    if(isset($_POST["row"])){
     
         $ids = $_POST["id"];
         $rows = $_POST["row"];
         
-        
+       
     if (isset($_POST['delete'])) {
         
 
@@ -40,12 +40,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         $stmt = $db->prepare("DELETE FROM app_ability2 WHERE id_app=?");
         $stmt -> execute([$ids[$row]]);
-        $messages2[] = 'Элементы удалены.';
+       
     }
-    
+    $messages2[] = 'Элементы удалены.';
     }
     
     if (isset($_POST['update'])) {
+        $errors=array();
         foreach ($rows as $row) {
             $data = [
                 'name' => $_POST['fio'][$row],
@@ -58,10 +59,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ];
            // var_dump($data);
             $abilities = $_POST['abilities' . $row];
-            $errors=validateFormData($data, $abilities,$row);
-            
+            $errors[$row]=validateFormData($data, $abilities,$row);
+
         }
-        if ($errors) {
+        if (count(array_filter($errors))!=0) {
             // При наличии ошибок перезагружаем страницу и завершаем работу скрипта.
             header('Location: admin.php');
             exit();
@@ -82,11 +83,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $abilities = $_POST['abilities' . $row];
             
             update_application($db, $ids[$row], $data, $abilities);
-            $messages2[] = 'Результаты сохранены.';
+            
         }
-    
+        $messages2[] = 'Результаты сохранены.';
         }
-}
+    }
+    }
+    else {
+        $messages2[] = 'Вы не выбрали ни одного элемента, который хотите сохранить или удалить!';
+    }
 }
 print('Вы успешно авторизовались и видите защищенные паролем данные.');
 
@@ -128,7 +133,7 @@ print('Вы успешно авторизовались и видите защи
 html, body {
     height: 100vh;
   font-family: monospace;
-  font-size: 20px;
+  font-size: 15px;
   }
   
  
@@ -139,6 +144,13 @@ html, body {
 	text-align: center;
 }
 
+body{
+padding:10px;
+}
+
+#del_adm{
+	float:right;
+}
 
 </style>
 <?php if (!empty($messages2)) {
@@ -153,31 +165,6 @@ html, body {
     
     print('</div>');
 }?>
-
-<form action="" method="POST">
-<table class="table table-bordered">
-<tr>
-<th scope="col">id</th>
-<th scope="col">name</th>
-<th scope="col">email</th>
-<th scope="col">date_of_birth</th>
-<th scope="col">gender</th>
-<th scope="col">limbs</th>
-<th scope="col">abilities</th>
-<th scope="col">bio</th>
-
-<th scope="col">checkbox</th>
-<th scope="col">user_id</th>
-<th scope="col">Выделить</th>
-</tr>
-<style>
-body{
-padding:10px;
-}
-
-#del_adm{
-	float:right;
-}</style>
 
 <?php
 $counter = 0;
@@ -209,18 +196,51 @@ if (!empty($messages)) {
     print('</div>');
 }
 
+$counter++; 
+?>
 
+
+<?php endforeach; ?>
+
+<form action="" method="POST">
+<table class="table table-bordered">
+<tr>
+<th scope="col">id</th>
+<th scope="col">имя</th>
+<th scope="col">email</th>
+<th scope="col">дата рождения</th>
+<th scope="col">пол</th>
+<th scope="col">конечности</th>
+<th scope="col">способности</th>
+<th scope="col">биография</th>
+
+<th scope="col">согласие</th>
+<th scope="col">uid</th>
+<th scope="col">Выделить</th>
+</tr>
+
+
+<?php
+$counter = 0;
+
+
+
+foreach ($result as $res): ?>
+
+<?php
+$errors = array();
+$errors=err_declare($counter);
 ?>
   <tr>
     <td><?= $res["id"] ?></td>
-    <input name="id[]" class="form-control" value="<?= strip_tags($res["id"]) ?>" type="hidden">
-    <td><input name="fio[]" class="form-control <?php if ($errors['fio']) {print 'is-invalid';} ?>" placeholder="Введите имя" value="<?= strip_tags($res["name"])  ?>"></td>
-    <td><input name="email[]" type="email" class="form-control <?php if ($errors['email']) {print 'is-invalid';} ?>" id="email" placeholder="Введите почту" value="<?= strip_tags($res["email"]) ?>"></td>
-    <td><input name="date_of_birth[]" type="date" class="form-control <?php if ($errors['date_of_birth']) {print 'is-invalid';} ?>" value="<?= strip_tags($res["date_of_birth"]) ?>"></td>
+    <input name="id[]" class="form-control form-control-sm" value="<?= strip_tags($res["id"]) ?>" type="hidden">
+    <td><input name="fio[]" class="form-control form-control-sm <?php if ($errors['fio']) {print 'is-invalid';} ?>" placeholder="Введите имя" value="<?= strip_tags($res["name"])  ?>"></td>
+    <td><input name="email[]" type="email" class="form-control form-control-sm <?php if ($errors['email']) {print 'is-invalid';} ?>" id="email" placeholder="Введите почту" value="<?= strip_tags($res["email"]) ?>"></td>
+    <td><input name="date_of_birth[]" type="date" class="form-control form-control-sm <?php if ($errors['date_of_birth']) {print 'is-invalid';} ?>" value="<?= strip_tags($res["date_of_birth"]) ?>"></td>
     <td> <label for="g1"><input type="radio" class="form-check-input <?php if ($errors['gender']) {print 'is-invalid';} ?>" name="gender<?= $counter ?>" id="g1" value="m" <?php if ($res["gender"]=="m") {print 'checked';} ?>>
-                    Мужской</label> 
+                    М</label> 
                      <label for="g2"><input type="radio" class="form-check-input <?php if ($errors['gender']) {print 'is-invalid';} ?>" name="gender<?= $counter ?>" id="g2" value="w" <?php if ($res["gender"]=="w") {print 'checked';} ?>>
-                    Женский</label></td>
+                    Ж</label></td>
                     
     <td> <label for="l1"><input type="radio" class="form-check-input <?php if ($errors['gender']) {print 'is-invalid';} ?>" name="limbs<?= $counter ?>" id="l1" value="2" <?php if ($res["limbs"]=="2") {print 'checked';} ?>>
                     2</label> 
@@ -231,7 +251,7 @@ $stmt -> execute([$res["id"]]);
 $result2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
-    <td> <select class="form-control <?php if ($errors['abilities']) {print 'is-invalid';} ?>" name="abilities<?= $counter ?>[]" id="mltplslct" multiple="multiple">
+    <td> <select class="form-control form-control-sm <?php if ($errors['abilities']) {print 'is-invalid';} ?>" name="abilities<?= $counter ?>[]" id="mltplslct" multiple="multiple">
                     <option value="1" <?php if(!empty($result2)) {if ($result2[0]['id_ab']=='1') {print 'selected';}} ?>>бессмертие</option>
                     <option value="2" <?php if(!empty($result2)) {if ((isset($result2[0]['id_ab']) && $result2[0]['id_ab'] == '2') ||
     (isset($result2[1]['id_ab']) && $result2[1]['id_ab'] == '2')) {print 'selected';}} ?>>прохождение сквозь стены</option>
@@ -239,7 +259,7 @@ $result2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
     (isset($result2[1]['id_ab']) && $result2[1]['id_ab'] == '3') ||
     (isset($result2[2]['id_ab']) && $result2[2]['id_ab'] == '3')) {print 'selected';}} ?>>левитация</option>
                 </select></td>
-    <td><textarea  name="bio[]" rows="3" class="form-control <?php if ($errors['bio']) {print 'is-invalid';} ?>"><?= strip_tags($res["bio"]) ?></textarea></td>
+    <td><textarea  name="bio[]" rows="3" class="form-control form-control-sm <?php if ($errors['bio']) {print 'is-invalid';} ?>"><?= strip_tags($res["bio"]) ?></textarea></td>
     <td><input name="checkbox<?= $counter ?>" type="checkbox" class="form-check-input <?php if ($errors['checkbox']) {print 'is-invalid';} ?>" value="1" <?php if ($res["checkbox"]=="1") {print 'checked';} ?>></td>
     <td><?= $res["user_id"] ?></td>
     <td><input type="checkbox" name="row[]" value="<?= $counter ?>"></td>
