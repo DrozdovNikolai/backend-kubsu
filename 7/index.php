@@ -148,16 +148,12 @@ else {
   if (!empty($_COOKIE[session_name()]) &&
       session_start() && !empty($_SESSION['login'])) {
          
-          if (!empty($_POST['token'])) {
-              if (!hash_equals($_SESSION['token'], $_POST['token'])) {
-                  header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
-                  exit;
-              }
-          }
-          else {
-              header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
-              exit;
-          }
+        if (empty($_POST['token']) || !hash_equals($_SESSION['token'], $_POST['token']))
+    {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
+        exit;
+    }
+
           $stmt = $db->prepare("SELECT id FROM application2 WHERE user_id = ?");
           $stmt -> execute([$_SESSION['uid']]);
           $result3 = $stmt->fetchAll(PDO::FETCH_ASSOC);

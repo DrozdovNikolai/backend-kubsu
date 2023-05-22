@@ -28,13 +28,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     {
         session_start();
     } 
-    if (!empty($_POST['token'])) {
-        if (!hash_equals($_SESSION['token'], $_POST['token'])) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
-            exit;
-        }
-    }
-    else {
+
+    if (empty($_POST['token']) || !hash_equals($_SESSION['token'], $_POST['token']))
+    {
         header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
         exit;
     }
